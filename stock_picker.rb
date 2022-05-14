@@ -4,25 +4,17 @@ class StockPicker
   # answer returned is a hash with buy index, sell index and profit made
 
   # @param [Object] arr
-  # @return [Object]
+  # @return [Object] hash
   def stock_picker(arr)
-    answer = {}
+    arr.each_with_object({}) do |day, answer|
+      max_future_day_value = arr[arr.find_index(day)..-1].max
+      max_future_day_index = arr.find_index(max_future_day_value)
+      difference = max_future_day_value - day
+      next unless answer.empty? || answer[:profit] < difference
 
-    # this is best case if the min comes before the max
-    return [arr.index(arr.min), arr.index(arr.max), arr.max - arr.min] if arr.index(arr.min) < arr.index(arr.max)
-
-    arr.each_with_index do |day, index|
-
-      return answer if index >= arr.length - 1
-
-      # diff between day and min of future days
-      max_future_day_value = arr[index..-1].max
-      difference = max_future_day_value - arr[index]
-      if answer.empty? || answer[:profit] < difference
-        answer = { buy: index, sell: arr.find_index(max_future_day_value),
-                   profit: difference }
-      end
+      answer[:buy] = arr.find_index(day)
+      answer[:sell] = max_future_day_index
+      answer[:profit] = difference
     end
-    answer
   end
 end
